@@ -1,8 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
 
-
-
 /**
  * Get recipes list from spooncular response and extract the relevant recipe data for preview
  * @param {*} recipes_info 
@@ -17,7 +15,6 @@ async function getRecipeInformation(recipe_id , includeNutrition_value) {
         }
     });
 }
-
 
 async function getRecipeDetails(recipe_id, includeNutrition_value) {
     let recipe_info = await getRecipeInformation(recipe_id, includeNutrition_value);
@@ -63,9 +60,15 @@ async function getThreeRecipesByType(typeOfRecipes){
     }
     else if(typeOfRecipes == 'family'){
         console.log("family")
+
     }  
     else if(typeOfRecipes == 'favorite'){
-        console.log("favorite")
+        const recipes_id_list = await getFavoriteRecipes()
+        let recipes_list = [] 
+        for(let i=0; i < 3; i++ ){
+            recipes_list.push(getRecipeDetails(recipes_id_list[i], false))
+        }
+        return recipes_list
     }     
 }
 
@@ -74,7 +77,27 @@ async function getThreeRecipes(typeOfRecipes) {
     return recipe_info.data
 }   
 
+async function getSearchResults(query_str){
+    //, num_of_results, cuisine, diet, intolerances
+    return await axios.get(`${api_domain}/complexSearch`, {
+        params: {
+            query: query_str,
+            // number: num_of_results,
+            // cuisine: cuisine,
+            // diet: diet,
+            // intolerances:intolerances,
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+}
 
+async function searchForRecipe(query_str){
+    let search_results = await getSearchResults(query_str);
+    // let search_results = await getSearchResults(query_str, num_of_results, cuisine, diet, intolerances);
+    return search_results.data
+}
+
+exports.searchForRecipe = searchForRecipe;
 exports.getRecipeDetails = getRecipeDetails;
 exports.getThreeRecipes  = getThreeRecipes;
 

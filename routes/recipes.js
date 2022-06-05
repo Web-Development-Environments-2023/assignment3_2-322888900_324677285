@@ -42,4 +42,18 @@ router.get("/partialRecipe/:recipeId", async (req, res, next) => {
   }
 });
 
+/**
+ * This path returns a list of search results 
+ */
+ router.get("/searchForRecipe/:query", async (req, res, next) => {
+  try {
+    //, req.params.numberOfResults, req.params.cuisine, 
+    const recipe = await recipes_utils.searchForRecipe(req.params.query);
+    res.send(recipe);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 module.exports = router;
