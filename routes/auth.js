@@ -3,12 +3,15 @@ var router = express.Router();
 const MySql = require("../routes/utils/MySql");
 const DButils = require("../routes/utils/DButils");
 const bcrypt = require("bcrypt");
+// var bodyParser = require('body-parser');
+// router.use(bodyParser.json());
 
 router.post("/Register", async (req, res, next) => {
   try {
     // parameters exists
     // valid parameters
     // username exists
+    console.log(req.body)
     let user_details = {
       username: req.body.username,
       firstname: req.body.firstname,
@@ -19,8 +22,7 @@ router.post("/Register", async (req, res, next) => {
       profilePic: req.body.profilePic
     }
     let users = [];
-    users = await DButils.execQuery("SELECT user_id from users");
-
+    users = await DButils.execQuery("SELECT user_name from users");
     if (users.find((x) => x.username === user_details.username))
       throw { status: 409, message: "Username taken" };
 
@@ -42,14 +44,14 @@ router.post("/Register", async (req, res, next) => {
 router.post("/Login", async (req, res, next) => {
   try {
     // check that username exists
-    const users = await DButils.execQuery("SELECT user_id FROM users");
+    const users = await DButils.execQuery("SELECT user_name FROM users");
     if (!users.find((x) => x.username === req.body.username))
       throw { status: 401, message: "Username or Password incorrect" };
 
     // check that the password is correct
     const user = (
       await DButils.execQuery(
-        `SELECT * FROM users WHERE user_id = '${req.body.username}'`
+        `SELECT * FROM users WHERE user_name = '${req.body.username}'`
       )
     )[0];
 
@@ -58,7 +60,7 @@ router.post("/Login", async (req, res, next) => {
     }
 
     // Set cookie
-    req.session.user_id = user.user_id;
+    req.session.user_id = user.user_name;
 
 
     // return cookie
