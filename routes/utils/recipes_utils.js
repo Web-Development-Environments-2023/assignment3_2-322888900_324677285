@@ -77,23 +77,26 @@ async function getThreeRecipes(typeOfRecipes) {
     return recipe_info.data
 }   
 
-async function getSearchResults(query_str){
+async function getSearchResults(query_str, num_of_results, cuisine, diet, intolerances){
     //, num_of_results, cuisine, diet, intolerances
     return await axios.get(`${api_domain}/complexSearch`, {
         params: {
             query: query_str,
-            // number: num_of_results,
-            // cuisine: cuisine,
-            // diet: diet,
-            // intolerances:intolerances,
+            number: num_of_results,
+            cuisine: cuisine,
+            diet: diet,
+            intolerances: intolerances,
             apiKey: process.env.spooncular_apiKey
         }
     });
 }
 
-async function searchForRecipe(query_str){
-    let search_results = await getSearchResults(query_str);
-    // let search_results = await getSearchResults(query_str, num_of_results, cuisine, diet, intolerances);
+async function searchForRecipe(query, numberOfResults, cuisine, diet, intolerances){
+    // let search_results = await getSearchResults(query_str);
+    if(numberOfResults === undefined){
+        numberOfResults = 5
+    }
+    let search_results = await getSearchResults(query, numberOfResults, cuisine, diet, intolerances);
     return search_results.data
 }
 
