@@ -7,7 +7,7 @@ const api_domain = "https://api.spoonacular.com/recipes";
  */
 
 
-async function getRecipeInformation(recipe_id , includeNutrition_value) {
+async function getRecipeInformation(recipe_id , includeNutrition_value ) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
             includeNutrition: includeNutrition_value,
@@ -16,36 +16,32 @@ async function getRecipeInformation(recipe_id , includeNutrition_value) {
     });
 }
 
-async function getRecipeDetails(recipe_id, includeNutrition_value) {
+async function getRecipeDetails(recipe_id, includeNutrition_value, search_result) {
     let recipe_info = await getRecipeInformation(recipe_id, includeNutrition_value);
-    if (includeNutrition_value == false){
-        let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
-        return {
-            id: id,
-            title: title,
-            readyInMinutes: readyInMinutes,
-            image: image,
-            popularity: aggregateLikes,
-            vegan: vegan,
-            vegetarian: vegetarian,
-            glutenFree: glutenFree,
-        }
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, instructions, extendedIngredients, servings } = recipe_info.data;
+    let json_data = {
+        id: id,
+        title: title,
+        readyInMinutes: readyInMinutes,
+        image: image,
+        popularity: aggregateLikes,
+        vegan: vegan,
+        vegetarian: vegetarian,
+        glutenFree: glutenFree,
     }
-    else{
-        let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, instructions, extendedIngredients, servings } = recipe_info.data;
-        return {
-            id: id,
-            title: title,
-            readyInMinutes: readyInMinutes,
-            image: image,
-            popularity: aggregateLikes,
-            vegan: vegan,
-            vegetarian: vegetarian,
-            glutenFree: glutenFree,
-            servings: servings,
-            instructions: instructions, 
-            extendedIngredients: extendedIngredients ,
-        }
+
+    if (includeNutrition_value == false && search_result == false){
+        return json_data
+    }
+    else if(includeNutrition_value == true && search_result == false){
+        json_data.instructions = instructions
+        json_data.extendedIngredients = extendedIngredients
+        json_data.servings = servings
+        return json_data
+    }
+    else if(includeNutrition_value == false && search_result == true){
+        json_data.instructions = instructions
+        return json_data
     }
 }
 
@@ -59,16 +55,13 @@ async function getThreeRecipesByType(typeOfRecipes){
         });
     }
     else if(typeOfRecipes == 'family'){
-        console.log("family")
+        const recipes_id_list = await getFamilyRecipes()
+        return push_recipe_data_to_list(recipes_id_list)
 
     }  
     else if(typeOfRecipes == 'favorite'){
         const recipes_id_list = await getFavoriteRecipes()
-        let recipes_list = [] 
-        for(let i=0; i < 3; i++ ){
-            recipes_list.push(getRecipeDetails(recipes_id_list[i], false))
-        }
-        return recipes_list
+        return push_recipe_data_to_list(recipes_id_list)
     }     
 }
 
@@ -92,12 +85,23 @@ async function getSearchResults(query_str, num_of_results, cuisine, diet, intole
 }
 
 async function searchForRecipe(query, numberOfResults, cuisine, diet, intolerances){
-    // let search_results = await getSearchResults(query_str);
     if(numberOfResults === undefined){
         numberOfResults = 5
     }
     let search_results = await getSearchResults(query, numberOfResults, cuisine, diet, intolerances);
-    return search_results.data
+    const data = search_results.data["results"]
+    let results = []
+    for (let i = 0; i< data.length; i++){
+        results.push(await getRecipeDetails(data[i]["id"], false, true))
+    }    
+    return results
+}
+
+async function push_recipe_data_to_list(recipes_id_list){
+    for(let i=0; i < 3; i++ ){
+        recipes_list.push( await getRecipeDetails(recipes_id_list[i], false, false))
+    }
+    return recipes_list
 }
 
 exports.searchForRecipe = searchForRecipe;
