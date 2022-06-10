@@ -6,12 +6,12 @@ const bcrypt = require("bcrypt");
 // var bodyParser = require('body-parser');
 // router.use(bodyParser.json());
 
+
 router.post("/Register", async (req, res, next) => {
   try {
     // parameters exists
     // valid parameters
     // username exists
-    console.log(req.body)
     let user_details = {
       username: req.body.username,
       firstname: req.body.firstname,
@@ -33,7 +33,7 @@ router.post("/Register", async (req, res, next) => {
     );
     await DButils.execQuery(
       `INSERT INTO users VALUES ('${user_details.username}', '${user_details.firstname}', '${user_details.lastname}',
-      '${user_details.country}', '${hash_password}', '${user_details.email}')`
+     '${hash_password}', '${user_details.country}', '${user_details.email}')`
     );
     res.status(201).send({ message: "user created", success: true });
   } catch (error) {
@@ -43,10 +43,11 @@ router.post("/Register", async (req, res, next) => {
 
 router.post("/Login", async (req, res, next) => {
   try {
+    let resssss = await DButils.execQuery("SELECT * FROM users");
     // check that username exists
-    const users = await DButils.execQuery("SELECT user_name FROM users");
-    if (!users.find((x) => x.username === req.body.username))
-      throw { status: 401, message: "Username or Password incorrect" };
+    const users = await DButils.execQuery("SELECT * FROM users");
+    if (!users.find((x) => x.user_name === req.body.username))
+      throw { status: 401, message: " 1 Username or Password incorrect" };
 
     // check that the password is correct
     const user = (
@@ -55,14 +56,14 @@ router.post("/Login", async (req, res, next) => {
       )
     )[0];
 
-    if (!bcrypt.compareSync(req.body.password, user.password)) {
-      throw { status: 401, message: "Username or Password incorrect" };
+    if (!bcrypt.compareSync(req.body.password, user.h_password)) {
+      throw { status: 401, message: " 2 Username or Password incorrect" };
     }
 
     // Set cookie
     req.session.user_id = user.user_name;
 
-
+    res.cookie("user_id", user.user_name)
     // return cookie
     res.status(200).send({ message: "login succeeded", success: true });
   } catch (error) {
