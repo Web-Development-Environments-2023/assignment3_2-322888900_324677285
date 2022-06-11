@@ -36,10 +36,10 @@ router.get("/favorites", async (req, res, next) => {
 });
 
 // This path adds a recipe to the favorites of the user
-router.post("/favorites/:recipe_id", async (req, res, next) => {
+router.post("/favorites", async (req, res, next) => {
   try {
     const user_name = req.session.user_id;
-    const recipe_id = req.params.recipe_id;
+    const recipe_id = req.body.recipe_id;
     await user_utils.markAsFavorite(user_name, recipe_id);
     res.status(200).send("The Recipe successfully saved as favorite");
   } catch (error) {
@@ -59,51 +59,7 @@ router.get("/family", async (req, res, next) => {
   }
 });
 
-//NIV DONE
-// user recepies
-// This path returns all user's recipes 
-// router.get("/myRecipes", async (req, res, next) => {
-//   try {
-//     const results = await user_utils.getUserRecipes(req.session.user_id);
-//     res.send(results);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-//NIV DONE
-// user recepies
-// This path returns all user's recipes 
-// router.post("/myRecipes/:recipeId", async (req, res, next) => {
-//   try {
-//     const results = await user_utils.addRecipeToUser(req.session.user_id,req.params.recipe_id);
-//     res.send(results);
-//   } catch (error) {
-//     next(error);
-//   }
-// });
-
-
-
-
-
-//gets: last three recepies (id's) showen by the user
-//we assume the the request contains json such as:
-//{
-//"first_last":id,"second_last":id,"third_last":id
-//}
-//returns: all the recepies
-//NIV DONE
-//router.get("/lastThree", async (req, res, next) =>{
-  //try {
-    //const results = await user_utils.getFamilyRecipesFromDb(req.session.user_id);
-    //res.send(results);
-  //} catch (error) {
-    //next(error);
-  //}
-//})
-
-
+// this path adds new family recipe to the db for a user
 router.post("/family", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id;
@@ -116,6 +72,71 @@ router.post("/family", async (req, res, next) =>{
     await user_utils.addFamilyRecipeToDb(user_name, 
       recipe_id, owner, when_to_cook, ingredients, instructions, photos);
     res.send({ success: true, message: "Added new family recipe!" });
+  } catch (error) {
+    next(error);
+  }
+})
+
+
+// MY RECIPES
+// This path returns all user's recipes 
+router.get("/myRecipes", async (req, res, next) => {
+  try {
+    const results = await user_utils.getUserRecipes(req.session.user_id);
+    res.send(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// This path adds new recipe to the logged in user
+router.post("/myRecipes", async (req, res, next) => {
+  try {
+    let params = {}
+    params.user_name = req.session.user_id
+    params.recipe_name = req.body.recipe_name
+    params.duration =  req.body.duration
+    params.image = req.body.image
+    params.popularity = req.body.popularity
+    params.vegan = req.body.vegan
+    params.vegetarian = req.body.vegetarian
+    params.glutenFree = req.body.glutenFree
+    params.instructions = req.body.instructions
+    params.extendedIngredients = req.body.extendedIngredients
+    params.servings = req.body.servings
+    const results = await user_utils.addRecipeToUser(params);
+    res.status(200).send("The recipe was successfully added");
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+// LAST SEEN
+//we assume the the request contains json such as:
+// {
+//   "recipe_1":id,
+//   "recipe_2":id,
+//   "recipe_3":id
+// }
+// last three seen recipes (id's) by the user
+router.get("/lastThree", async (req, res, next) =>{
+  try {
+    const user_name = req.session.user_id
+    const recipe_1 = req.query.recipe_1
+    const recipe_2 = req.query.recipe_2
+    const recipe_3 = req.query.recipe_3
+    if(recipe_1 === undefined && recipe_2 === undefined && recipe_3 === undefined){
+      res.status(200).send("No last watched recipes yet....");
+    }
+    else{
+      let recipes_id = []
+      recipes_id.push(recipe_1)
+      recipes_id.push(recipe_2)
+      recipes_id.push(recipe_3)
+      const results = await user_utils.getLastThreeRecipes(user_name, recipes_id);
+      res.send(results);
+    }
   } catch (error) {
     next(error);
   }
