@@ -59,6 +59,51 @@ router.get("/family", async (req, res, next) => {
   }
 });
 
+//NIV DONE
+// user recepies
+// This path returns all user's recipes 
+// router.get("/myRecipes", async (req, res, next) => {
+//   try {
+//     const results = await user_utils.getUserRecipes(req.session.user_id);
+//     res.send(results);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+//NIV DONE
+// user recepies
+// This path returns all user's recipes 
+// router.post("/myRecipes/:recipeId", async (req, res, next) => {
+//   try {
+//     const results = await user_utils.addRecipeToUser(req.session.user_id,req.params.recipe_id);
+//     res.send(results);
+//   } catch (error) {
+//     next(error);
+//   }
+// });
+
+
+
+
+
+//gets: last three recepies (id's) showen by the user
+//we assume the the request contains json such as:
+//{
+//"first_last":id,"second_last":id,"third_last":id
+//}
+//returns: all the recepies
+//NIV DONE
+//router.get("/lastThree", async (req, res, next) =>{
+  //try {
+    //const results = await user_utils.getFamilyRecipesFromDb(req.session.user_id);
+    //res.send(results);
+  //} catch (error) {
+    //next(error);
+  //}
+//})
+
+
 router.post("/family", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id;
@@ -88,5 +133,7 @@ async function push_recipe_data_to_list(recipes_id_list){
   }
   return recipes_list
 }
+
+
 
 module.exports = router;
