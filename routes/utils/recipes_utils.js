@@ -36,9 +36,9 @@ async function getRecipeDetails(recipe_id, includeNutrition_value, search_result
         return json_data
     }
     else if(includeNutrition_value == true && search_result == false){
+        json_data.servings = servings
         json_data.instructions = instructions
         json_data.extendedIngredients = extendedIngredients
-        json_data.servings = servings
         return json_data
     }
     else if(includeNutrition_value == false && search_result == true){

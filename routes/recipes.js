@@ -29,7 +29,7 @@ router.get("/partialRecipe/:recipeId", async (req, res, next) => {
 // This path returns a list of 3 random recipes
 router.get("/random", async (req, res, next) => {
   try {
-    const results = await recipes_utils.getRandomRecipes(req.params.typeOfRecipe, req.session.user_id);
+    const results = await recipes_utils.getRandomRecipes();
     res.send(results);
   } catch (error) {
     next(error);

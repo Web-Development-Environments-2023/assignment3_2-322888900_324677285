@@ -28,7 +28,6 @@ router.get("/favorites", async (req, res, next) => {
     const user_name = req.session.user_id;
     const recipes_id = await user_utils.getFavoriteRecipes(user_name);  
     recipes_data_list = await push_recipe_data_to_list(recipes_id)
-    console.log(recipes_data_list)
     res.status(200).send(recipes_data_list);
   } catch (error) {
     next(error);
@@ -40,7 +39,7 @@ router.post("/favorites", async (req, res, next) => {
   try {
     const user_name = req.session.user_id;
     const recipe_id = req.body.recipe_id;
-    await user_utils.markAsFavorite(user_name, recipe_id);
+    result_status = await user_utils.markAsFavorite(user_name, recipe_id);
     res.status(200).send("The Recipe successfully saved as favorite");
   } catch (error) {
     next(error);

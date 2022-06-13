@@ -5,10 +5,11 @@ const recipes_utils = require("./recipes_utils");
 // sets favorites of user 
 async function markAsFavorite(user_name, recipe_id){
     try{
+        recipes_list = await recipes_utils.getRecipeDetails(recipe_id, false, false)
         await DButils.execQuery(`insert into favorites values (${recipe_id}, '${user_name}')`);
     }
     catch(err){
-       throw { status: 401, message: err };
+       throw { status: 400, message: "No such recipe" };
     }
     
 }
@@ -35,7 +36,7 @@ async function getFamilyRecipesFromDb(user_name){
         return recipes_id;
     }
     catch(err){
-        throw { status: 401, message: err };
+        throw { status: 400, message: err };
     }
 
 }
@@ -46,7 +47,7 @@ async function addFamilyRecipeToDb(user_name, recipe_id, owner, when_to_cook, in
         await DButils.execQuery(`insert into familyrecipes values ('${user_name}', '${recipe_id}', '${owner}', '${when_to_cook}', '${ingredients}', '${instructions}',' ${photos}')`);
     }
     catch(err){
-        throw { status: 401, message: err };
+        throw { status: 400, message: err };
     }
 }
 
@@ -117,6 +118,7 @@ async function getLastThreeRecipes(user_name, recipes_id){
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.getFamilyRecipesFromDb = getFamilyRecipesFromDb;
+exports.addFamilyRecipeToDb = addFamilyRecipeToDb;
 exports.getUserRecipes = getUserRecipes;
 exports.addRecipeToUser = addRecipeToUser
 exports.getLastThreeRecipes = getLastThreeRecipes
