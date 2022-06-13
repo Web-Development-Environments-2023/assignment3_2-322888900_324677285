@@ -31,7 +31,7 @@ async function getFavoriteRecipes(user_name){
 async function getFamilyRecipesFromDb(user_name){
     try{
 
-        const recipes_id = await DButils.execQuery(`select recipe_id from familyrecipes where user_name='${user_name}'`);
+        const recipes_id = await DButils.execQuery(`select * from familyrecipes where user_name='${user_name}'`);
         return recipes_id;
     }
     catch(err){

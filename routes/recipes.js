@@ -40,12 +40,6 @@ router.get("/random", async (req, res, next) => {
 // This path returns a list of search results 
  router.get("/searchForRecipe/:query", async (req, res, next) => {
   try {
-    console.log(req.params.query)
-    console.log(req.query.numberOfResults)
-    console.log(req.query.cuisine)
-    console.log(req.query.diet)
-    console.log(req.query.intolerances)
-  
     const recipe = await recipes_utils.searchForRecipe(req.params.query,  
       req.query.numberOfResults, req.query.cuisine, req.query.diet, req.params.intolerances);
     res.send(recipe);
