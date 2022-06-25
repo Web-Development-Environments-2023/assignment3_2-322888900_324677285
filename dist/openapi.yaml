@@ -485,6 +485,10 @@ components:
           example: g.milk 2 , eggs, 2
           items:
             $ref: '#/components/schemas/fullRecipe_ingredients'
+        analyzedInstructions:
+          type: array
+          description: analayzed instructions
+          example: 1. do this, 2. do that...
       description: Model for part of the recipe data
     arrayOfRecipes:
       type: object

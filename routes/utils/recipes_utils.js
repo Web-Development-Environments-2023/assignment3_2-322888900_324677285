@@ -20,7 +20,7 @@ async function recipeInfoFromApi(recipe_id , includeNutrition_value ) {
 
 async function getRecipeDetails(recipe_id, includeNutrition_value, search_result) {
     let recipe_info = await recipeInfoFromApi(recipe_id, includeNutrition_value);
-    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, instructions, extendedIngredients, servings } = recipe_info.data;
+    let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree, instructions, extendedIngredients, servings , analyzedInstructions} = recipe_info.data;
     let json_data = {
         id: id,
         title: title,
@@ -30,6 +30,7 @@ async function getRecipeDetails(recipe_id, includeNutrition_value, search_result
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
+        analyzedInstructions: analyzedInstructions
     }
 
     if (includeNutrition_value == false && search_result == false){
