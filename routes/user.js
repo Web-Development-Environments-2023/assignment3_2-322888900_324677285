@@ -8,8 +8,10 @@ const recipes_utils = require("./utils/recipes_utils");
  * Authenticate all incoming requests by middleware
  */
 router.use(async function (req, res, next) { 
+  
   if (req.session && req.session.user_id) {
     DButils.execQuery("SELECT user_name FROM users").then((users) => {
+  
       if (users.find((x) => x.user_name === req.session.user_id)) {
         req.user_name = req.session.user_id;
         next();
@@ -28,6 +30,7 @@ router.get("/favorites", async (req, res, next) => {
     const user_name = req.session.user_id;
     const recipes_id = await user_utils.getFavoriteRecipes(user_name);  
     recipes_data_list = await push_recipe_data_to_list(recipes_id)
+    console.log(recipes_data_list)
     res.status(200).send(recipes_data_list);
   } catch (error) {
     next(error);
@@ -111,32 +114,27 @@ router.post("/myRecipes", async (req, res, next) => {
 });
 
 
-// LAST SEEN
-//we assume the the request contains json such as:
-// {
-//   "recipe_1":id,
-//   "recipe_2":id,
-//   "recipe_3":id
-// }
+
 // last three seen recipes (id's) by the user
-router.get("/lastThree", async (req, res, next) =>{
+router.post("/lastThree", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id
-    const recipe_1 = req.query.recipe_1
-    const recipe_2 = req.query.recipe_2
-    const recipe_3 = req.query.recipe_3
-    if(recipe_1 === undefined && recipe_2 === undefined && recipe_3 === undefined){
-      res.status(200).send("No last watched recipes yet....");
+    const Recipe = req.query.recipe
+    const results = await user_utils.getLastThreeRecipes(user_name, Recipe);
+    res.send(results);
     }
-    else{
-      let recipes_id = []
-      recipes_id.push(recipe_1)
-      recipes_id.push(recipe_2)
-      recipes_id.push(recipe_3)
-      const results = await user_utils.getLastThreeRecipes(user_name, recipes_id);
-      res.send(results);
+   catch (error) {
+    next(error);
+  }
+})
+// last search seen recipes (id's) by the user
+router.get("/lastView", async (req, res, next) =>{
+  try {
+    const user_name = req.session.user_id
+    const results = await user_utils.getLastView(user_name);
+    res.send(results);
     }
-  } catch (error) {
+   catch (error) {
     next(error);
   }
 })
