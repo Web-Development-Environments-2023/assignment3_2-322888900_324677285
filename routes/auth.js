@@ -20,6 +20,7 @@ router.post("/Register", async (req, res, next) => {
       profilePic: req.body.profilePic
     }
     let users = [];
+   
     users = await DButils.execQuery("SELECT user_name from users");
     if (users.find((x) => x.username === user_details.username))
       throw { status: 409, message: "Username taken" };
@@ -41,7 +42,6 @@ router.post("/Register", async (req, res, next) => {
 
 router.post("/Login", async (req, res, next) => {
   try {
-    let resssss = await DButils.execQuery("SELECT * FROM users");
     // check that username exists
     const users = await DButils.execQuery("SELECT * FROM users");
     if (!users.find((x) => x.user_name === req.body.username))
@@ -60,7 +60,6 @@ router.post("/Login", async (req, res, next) => {
 
     // Set cookie
     req.session.user_id = user.user_name;
-
     res.cookie("user_id", user.user_name)
     // return cookie
     res.status(200).send({ message: "login succeeded", success: true });
