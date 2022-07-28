@@ -119,7 +119,8 @@ async function getLastView(user_name){
 
 
 exports.getLastView=getLastView;
-exports.getLastThreeRecipes=getLastThreeRecipes;
+exports.addLastSeenRecipes=addLastSeenRecipes;
+exports.getLastSeenRecipes=getLastSeenRecipes;
 exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.getFamilyRecipesFromDb = getFamilyRecipesFromDb;
