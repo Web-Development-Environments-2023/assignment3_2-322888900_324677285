@@ -39,31 +39,51 @@ async function getFamilyRecipesFromDb(user_name){
 
 }
 
-async function getLastThreeRecipes(user_name, Recipe){
+async function getLastSeenRecipes(user_name){
     try{
-        const listOfRecipes = await DButils.execQuery(`select * from lastthree where user_name='${user_name}'`);
+        const listOfRecipes = await DButils.execQuery(`select * from lastseenrecipes where user_name='${user_name}'`);
+        let response_body = {}
+        response_body.user_name = user_name
         if(!listOfRecipes){
-            await DButils.execQuery(`insert into lastthree values ('${user_name}', '${Recipe}','${null}','${null}'`);
-            return {"user_name":user_name, "FirstRecipe":Recipe}
+            if(listOfRecipes.FirstRecipe){
+                response_body.FirstRecipe = listOfRecipes.FirstRecipe 
+            }
+            if(listOfRecipes.SecondRecipe){
+                response_body.SecondRecipe = listOfRecipes.SecondRecipe
+            }
+            if(listOfRecipes.ThirdRecipe){
+                response_body.ThirdRecipe = listOfRecipes.ThirdRecipe
+            }
+            return response_body
         }
-        else if(listOfRecipes.FirstRecipe&& !listOfRecipes.SecondeRecipe){
-            await DButils.execQuery(`insert into lastthree values ('${user_name}', '${listOfRecipes.FirstRecipe}','${Recipe}','${null}'`);
-            return {"user_name":user_name, "FirstRecipe":listOfRecipes.FirstRecipe,"SecondRecipe":Recipe}
-        }
-        else if(listOfRecipes.SecondRecipe&& !listOfRecipes.ThirdRecipe){
-            await DButils.execQuery(`insert into lastthree values ('${user_name}', '${listOfRecipes.FirstRecipe}','${listOfRecipes.SecondRecipe}','${Recipe}'`);
-            return {"user_name":user_name, "FirstRecipe":listOfRecipes.FirstRecipe,"SecondRecipe":listOfRecipes.SecondRecipe,"ThirdRecipe":Recipe}
-        }
-        else{
-            await DButils.execQuery(`insert into lastthree values ('${user_name}', '${listOfRecipes.SecondRecipe}','${listOfRecipes.ThirdRecipe}','${Recipe}'`);
-            return {"user_name":user_name, "FirstRecipe":listOfRecipes.SecondRecipe,"SecondRecipe":listOfRecipes.ThirdRecipe,"ThirdRecipe":Recipe}
-        }
+        return response_body
     }
     catch(err){
         throw { status: 401, message: err };
     }
 }
 
+
+async function addLastSeenRecipes(user_name, Recipe){
+    try{
+        const listOfRecipes = await DButils.execQuery(`select * from lastseenrecipes where user_name='${user_name}'`);
+        if(!listOfRecipes){
+            await DButils.execQuery(`insert into lastseenrecipes values ('${user_name}', '${Recipe}','${null}','${null}'`);
+        }
+        else if(listOfRecipes.FirstRecipe&& !listOfRecipes.SecondeRecipe){
+            await DButils.execQuery(`insert into lastseenrecipes values ('${user_name}', '${listOfRecipes.FirstRecipe}','${Recipe}','${null}'`);
+        }
+        else if(listOfRecipes.SecondRecipe&& !listOfRecipes.ThirdRecipe){
+            await DButils.execQuery(`insert into lastseenrecipes values ('${user_name}', '${listOfRecipes.FirstRecipe}','${listOfRecipes.SecondRecipe}','${Recipe}'`);
+        }
+        else{
+            await DButils.execQuery(`insert into lastseenrecipes values ('${user_name}', '${listOfRecipes.SecondRecipe}','${listOfRecipes.ThirdRecipe}','${Recipe}'`);
+        }
+    }
+    catch(err){
+        throw { status: 401, message: err };
+    }
+}
 
 
 async function addFamilyRecipeToDb(user_name, recipe_id, owner, when_to_cook, ingredients, instructions, photos){
@@ -78,14 +98,14 @@ async function addFamilyRecipeToDb(user_name, recipe_id, owner, when_to_cook, in
 
 async function getLastView(user_name){
     try{
-        const listOfRecipes = await DButils.execQuery(`select * from lastthree where user_name='${user_name}'`);
+        const listOfRecipes = await DButils.execQuery(`select * from lastseenrecipes where user_name='${user_name}'`);
         if(!listOfRecipes){
             return null
         }
-        else if(listOfRecipes.FirstRecipe&& !listOfRecipes.SecondeRecipe){
+        else if(listOfRecipes.FirstRecipe && !listOfRecipes.SecondeRecipe){
             return listOfRecipes.FirstRecipe
         }
-        else if(listOfRecipes.SecondRecipe&& !listOfRecipes.ThirdRecipe){
+        else if(listOfRecipes.SecondRecipe && !listOfRecipes.ThirdRecipe){
             return listOfRecipes.SecondRecipe
         }
         else{

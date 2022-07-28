@@ -114,19 +114,32 @@ router.post("/myRecipes", async (req, res, next) => {
 });
 
 
-
-// last three seen recipes (id's) by the user
-router.post("/lastThree", async (req, res, next) =>{
+// returns the last three seen recipes (id's) by the user
+router.get("/lastSeenRecipes", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id
-    const Recipe = req.query.recipe
-    const results = await user_utils.getLastThreeRecipes(user_name, Recipe);
+    const results = await user_utils.getLastSeenRecipes(user_name);
     res.send(results);
     }
    catch (error) {
     next(error);
   }
 })
+
+// adds a recipe to last three seen recipes (id's) by the user
+router.post("/lastSeenRecipes", async (req, res, next) =>{
+  try {
+    const user_name = req.session.user_id
+    const Recipe = req.query.recipe
+    const results = await user_utils.addLastSeenRecipes(user_name, Recipe);
+    res.send(results);
+    }
+   catch (error) {
+    next(error);
+  }
+})
+
+
 // last search seen recipes (id's) by the user
 router.get("/lastView", async (req, res, next) =>{
   try {
