@@ -130,8 +130,8 @@ router.get("/lastSeenRecipes", async (req, res, next) =>{
 router.post("/lastSeenRecipes", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id
-    const Recipe = req.query.recipe
-    const results = await user_utils.addLastSeenRecipes(user_name, Recipe);
+    const recipe_id = req.body.recipe_id
+    const results = await user_utils.addLastSeenRecipes(user_name, recipe_id);
     res.send(results);
     }
    catch (error) {
