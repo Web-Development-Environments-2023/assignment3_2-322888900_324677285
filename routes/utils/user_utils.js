@@ -4,7 +4,7 @@ const recipes_utils = require("./recipes_utils")
 // favorite recipes
 async function markAsFavorite(user_name, recipe_id){
     try{
-        await DButils.execQuery(`insert into favorites values (${recipe_id}, '${user_name}')`);
+        await DButils.execQuery(`INSERT INTO favorites VALUES (${recipe_id}, '${user_name}')`);
     }
     catch(err){
        throw { status: 401, message: err };
@@ -13,11 +13,9 @@ async function markAsFavorite(user_name, recipe_id){
 }
 
 
-
-
 async function getFavoriteRecipes(user_name){
     try{
-        const recipes_id = await DButils.execQuery(`select recipe_id from favorites where user_name='${user_name}'`);
+        const recipes_id = await DButils.execQuery(`SELECT recipe_id FROM favorites WHERE user_name='${user_name}'`);
         return recipes_id;
     }
     catch(err){
@@ -39,8 +37,19 @@ async function getFamilyRecipesFromDb(user_name){
 
 }
 
+async function addFamilyRecipeToDb(user_name, recipe_id, owner, when_to_cook, ingredients, instructions, photos){
+    try{
+        await DButils.execQuery(`INSERT INTO familyrecipes VALUES ('${user_name}', '${recipe_id}', '${owner}', '${when_to_cook}', '${ingredients}', '${instructions}',' ${photos}')`);
+    }
+    catch(err){
+        throw { status: 401, message: err };
+    }
+}
+
+// Recentley viewed recipes
 async function getLastSeenRecipes(user_name){
     try{
+        console.log("in server function")
         let listOfRecipes = await DButils.execQuery(`SELECT * FROM lastseenrecipes WHERE user_name='${user_name}'`);
         console.log("the recipes are:")
         console.log(listOfRecipes)
@@ -79,24 +88,29 @@ async function addLastSeenRecipes(user_name, Recipe){
     try{
         
         let listOfRecipes = await DButils.execQuery(`SELECT * FROM lastseenrecipes WHERE user_name='${user_name}'`);
-        console.log(`the recipes are: ${listOfRecipes}`)
+        console.log('the recipes are:')
         console.log(listOfRecipes)
-        console.log(`the recipe to add ${Recipe}`)
-        if(listOfRecipes.length == 0){
-            console.log("empty array")
-            await DButils.execQuery(`INSERT INTO lastseenrecipes VALUES ('${user_name}', '${Recipe}','${null}','${null}')`);
-        }
-        else if(listOfRecipes[0].first_recipe && listOfRecipes[0].second_recipe === null){
-            console.log("has one recipe")
-            await DButils.execQuery(`UPDATE lastseenrecipes SET first_recipe = '${listOfRecipes[0].first_recipe}','${Recipe}','${null}' WHERE user_name = '${user_name}`);
-        }
-        else if(listOfRecipes[0].second_recipe && listOfRecipes[0].third_recipe === null){
-            console.log("has two recipes")
-            await DButils.execQuery(`UPDATE lastseenrecipes SET first_recipe = '${listOfRecipes[0].first_recipe}', second_recipe = '${listOfRecipes[0].second_recipe}','${Recipe}' WHERE user_name = '${user_name}`);
+        if(Recipe.toString() === listOfRecipes[0].first_recipe || Recipe.toString() === listOfRecipes[0].second_recipe || Recipe.toString() === listOfRecipes[0].third_recipe){
+            console.log("Recipe is already in recentley viewed")
         }
         else{
-            console.log("has three recipes")
-            await DButils.execQuery(`UPDATE lastseenrecipes SET second_recipe =  '${listOfRecipes[0].second_recipe}', third_recipe = '${listOfRecipes[0].third_recipe}','${Recipe}' WHERE user_name = '${user_name}'`);
+            if(listOfRecipes.length == 0){
+                console.log("empty array")
+                await DButils.execQuery(`INSERT INTO lastseenrecipes VALUES ('${user_name}', '${Recipe}','${null}','${null}')`);
+            }
+            else if(listOfRecipes[0].first_recipe !== 'null' && listOfRecipes[0].second_recipe === 'null'){
+                console.log("has one recipe")
+                await DButils.execQuery(`UPDATE lastseenrecipes SET second_recipe = '${Recipe}' WHERE user_name = '${user_name}'`);
+            }
+            else if(listOfRecipes[0].second_recipe !== 'null' && listOfRecipes[0].third_recipe === 'null'){
+                console.log("has two recipes")
+                await DButils.execQuery(`UPDATE lastseenrecipes SET third_recipe = '${Recipe}' WHERE user_name = '${user_name}'`);
+            }
+            else{
+                console.log("has three recipes")
+                await DButils.execQuery(`UPDATE lastseenrecipes SET first_recipe = '${listOfRecipes[0].second_recipe}', second_recipe = '${listOfRecipes[0].third_recipe}',third_recipe = '${Recipe}' WHERE user_name = '${user_name}'`);
+            }
+
         }
     }
     catch(err){
@@ -104,20 +118,10 @@ async function addLastSeenRecipes(user_name, Recipe){
     }
 }
 
-
-async function addFamilyRecipeToDb(user_name, recipe_id, owner, when_to_cook, ingredients, instructions, photos){
-    try{
-        await DButils.execQuery(`insert into familyrecipes values ('${user_name}', '${recipe_id}', '${owner}', '${when_to_cook}', '${ingredients}', '${instructions}',' ${photos}')`);
-    }
-    catch(err){
-        throw { status: 401, message: err };
-    }
-}
-
-
+// not sure if we need it
 async function getLastView(user_name){
     try{
-        const listOfRecipes = await DButils.execQuery(`select * from lastseenrecipes where user_name='${user_name}'`);
+        const listOfRecipes = await DButils.execQuery(`SELECT * FROM lastseenrecipes WHERE user_name='${user_name}'`);
         if(listOfRecipes.length == 0){
             return null
         }
