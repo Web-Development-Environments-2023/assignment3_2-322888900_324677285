@@ -106,7 +106,7 @@ router.post("/myRecipes", async (req, res, next) => {
     params.instructions = req.body.instructions
     params.extendedIngredients = req.body.extendedIngredients
     params.servings = req.body.servings
-    const results = await user_utils.addRecipeToUser(params);
+    await user_utils.addRecipeToUser(params);
     res.status(200).send("The recipe was successfully added");
   } catch (error) {
     next(error);
