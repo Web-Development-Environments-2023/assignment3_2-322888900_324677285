@@ -28,8 +28,8 @@ async function getFavoriteRecipes(user_name){
 async function getFamilyRecipesFromDb(user_name){
     try{
 
-        const recipes_id = await DButils.execQuery(`SELECT recipe_id FROM familyrecipes WHERE user_name='${user_name}'`);
-        return recipes_id;
+        const recipes = await DButils.execQuery(`SELECT * FROM familyrecipes WHERE user_name='${user_name}'`);
+        return recipes;
     }
     catch(err){
         throw { status: 401, message: err };
@@ -82,28 +82,19 @@ async function getLastSeenRecipes(user_name){
         throw { status: 400, message: "No recently viewed recipes yet" };
     }
 }
-//NEED TO DECIDE ABOUT THE COLUMNS BECAUSE THERE IS A PROBLEM WITH recipe_id AND FOREIGN KEYS
-async function addRecipeToUser(params){
-    try{
-        await DButils.execQuery(`INSERT INTO myrecipes VALUES ('1','${params.recipe_name}','${params.duration}', '${params.image}', '${params.popularity}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}',' ${params.user_name}',' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
-    }
-    catch(err){
-        throw { status: 401, message: err };
-    }
-}
 
 async function addLastSeenRecipes(user_name, Recipe){
     try{
         let listOfRecipes = await DButils.execQuery(`SELECT * FROM lastseenrecipes WHERE user_name='${user_name}'`);
-        if(Recipe.toString() === listOfRecipes[0].first_recipe || Recipe.toString() === listOfRecipes[0].second_recipe || Recipe.toString() === listOfRecipes[0].third_recipe){
-            console.log("Recipe is already in recentley viewed")
+        if(listOfRecipes.length === 0){
+            console.log("empty array")
+            await DButils.execQuery(`INSERT INTO lastseenrecipes VALUES ('${user_name}', '${Recipe}','${null}','${null}')`);
         }
         else{
-            if(listOfRecipes.length == 0){
-                console.log("empty array")
-                await DButils.execQuery(`INSERT INTO lastseenrecipes VALUES ('${user_name}', '${Recipe}','${null}','${null}')`);
+            if(Recipe.toString() === listOfRecipes[0].first_recipe || Recipe.toString() === listOfRecipes[0].second_recipe || Recipe.toString() === listOfRecipes[0].third_recipe){
+                console.log("Recipe is already in recentley viewed")
             }
-        else if(listOfRecipes[0].first_recipe !== 'null' && listOfRecipes[0].second_recipe === 'null'){
+            else if(listOfRecipes[0].first_recipe !== 'null' && listOfRecipes[0].second_recipe === 'null'){
                 console.log("has one recipe")
                 await DButils.execQuery(`UPDATE lastseenrecipes SET second_recipe = '${Recipe}' WHERE user_name = '${user_name}'`);
             }
@@ -115,7 +106,6 @@ async function addLastSeenRecipes(user_name, Recipe){
                 console.log("has three recipes")
                 await DButils.execQuery(`UPDATE lastseenrecipes SET first_recipe = '${listOfRecipes[0].second_recipe}', second_recipe = '${listOfRecipes[0].third_recipe}',third_recipe = '${Recipe}' WHERE user_name = '${user_name}'`);
             }
-
         }
     }
     catch(err){
@@ -145,6 +135,15 @@ async function getLastView(user_name){
     }
 }
 
+//NEED TO DECIDE ABOUT THE COLUMNS BECAUSE THERE IS A PROBLEM WITH FOREIGN KEYS
+async function addRecipeToUser(params){
+    try{
+        await DButils.execQuery(`INSERT INTO myrecipes (recipe_name, duration, image_url, popularity, is_vegan, is_vegeterian, gluten_free, user_name, ingredients, instructions, number_of_dishes) VALUES ('${params.recipe_name}','${params.duration}', '${params.image}', '${params.popularity}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}',' ${params.user_name}',' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
+    }
+    catch(err){
+        throw { status: 401, message: err };
+    }
+}
 
 exports.getLastView=getLastView;
 exports.addLastSeenRecipes=addLastSeenRecipes;

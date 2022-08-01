@@ -157,9 +157,6 @@ router.get("/lastView", async (req, res, next) =>{
 async function push_recipe_data_to_list(recipes_id_list){
   let recipes_list = []
   for(let i=0; i < recipes_id_list.length; i++ ){
-      if (i === 3){
-          break;
-      }
       recipes_list.push( await recipes_utils.getRecipeDetails(recipes_id_list[i]["recipe_id"], false, false))
   }
   return recipes_list
