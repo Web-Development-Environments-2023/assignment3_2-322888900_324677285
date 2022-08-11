@@ -85,6 +85,8 @@ router.post("/family", async (req, res, next) =>{
 router.get("/myRecipes", async (req, res, next) => {
   try {
     const results = await user_utils.getUserRecipes(req.session.user_id);
+    console.log(results)
+
     res.send(results);
   } catch (error) {
     next(error);

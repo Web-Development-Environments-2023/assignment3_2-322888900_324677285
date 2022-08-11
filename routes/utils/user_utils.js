@@ -138,7 +138,17 @@ async function getLastView(user_name){
 //NEED TO DECIDE ABOUT THE COLUMNS BECAUSE THERE IS A PROBLEM WITH FOREIGN KEYS
 async function addRecipeToUser(params){
     try{
-        await DButils.execQuery(`INSERT INTO myrecipes (recipe_name, duration, image_url, popularity, is_vegan, is_vegeterian, gluten_free, user_name, ingredients, instructions, number_of_dishes) VALUES ('${params.recipe_name}','${params.duration}', '${params.image}', '${params.popularity}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}',' ${params.user_name}',' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
+        await DButils.execQuery(`INSERT INTO myrecipes (title, readyInMinutes, image, aggregateLikes, is_vegan, is_vegeterian, gluten_free, user_name, ingredients, instructions, number_of_dishes) VALUES ('${params.recipe_name}','${params.duration}', '${params.image}', '${params.popularity}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}', "${params.user_name}",' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
+    }
+    catch(err){
+        throw { status: 401, message: err };
+    }
+}
+
+async function getUserRecipes(user_name){
+    try{
+       let user_recipes =  await DButils.execQuery(`SELECT * FROM myrecipes WHERE user_name='${user_name}'`);
+       return user_recipes
     }
     catch(err){
         throw { status: 401, message: err };
@@ -152,6 +162,5 @@ exports.markAsFavorite = markAsFavorite;
 exports.getFavoriteRecipes = getFavoriteRecipes;
 exports.getFamilyRecipesFromDb = getFamilyRecipesFromDb;
 exports.addFamilyRecipeToDb = addFamilyRecipeToDb;
-//NIV DONE
-//exports.getUserRecipes=getUserRecipes;
+exports.getUserRecipes=getUserRecipes;
 exports.addRecipeToUser=addRecipeToUser
