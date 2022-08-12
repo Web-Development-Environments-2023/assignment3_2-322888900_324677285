@@ -7,7 +7,7 @@ async function markAsFavorite(user_name, recipe_id){
         await DButils.execQuery(`INSERT INTO favorites VALUES (${recipe_id}, '${user_name}')`);
     }
     catch(err){
-       throw { status: 401, message: err };
+       throw { status: 400, message: "This recipe is already in your favorites" };
     }
     
 }
