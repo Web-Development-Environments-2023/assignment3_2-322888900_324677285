@@ -24,7 +24,7 @@ router.use(async function (req, res, next) {
 
 
 // FAVORITE
-// This path returns a list of 3 recipes by type 
+// This path returns a list of recipes 
 router.get("/favorites", async (req, res, next) => {
   try {
     const user_name = req.session.user_id;
