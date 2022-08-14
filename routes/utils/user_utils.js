@@ -145,7 +145,6 @@ async function getUserRecipes(user_name){
     }
 }
 
-exports.getLastView=getLastView;
 exports.addLastSeenRecipes=addLastSeenRecipes;
 exports.getLastSeenRecipes=getLastSeenRecipes;
 exports.markAsFavorite = markAsFavorite;
