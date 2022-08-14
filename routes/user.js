@@ -73,7 +73,7 @@ router.post("/family", async (req, res, next) =>{
     const photos = req.body.photos;
     await user_utils.addFamilyRecipeToDb(user_name, 
       recipe_id, owner, when_to_cook, ingredients, instructions, photos);
-    res.send({ success: true, message: "Added new family recipe!" });
+    res.status(200).send({ success: true, message: "Added new family recipe!" });
   } catch (error) {
     next(error);
   }
@@ -87,7 +87,7 @@ router.get("/myRecipes", async (req, res, next) => {
     const results = await user_utils.getUserRecipes(req.session.user_id);
     console.log(results)
 
-    res.send(results);
+    res.status(200).send(results);
   } catch (error) {
     next(error);
   }
@@ -133,21 +133,8 @@ router.post("/lastSeenRecipes", async (req, res, next) =>{
   try {
     const user_name = req.session.user_id
     const recipe_id = req.body.recipe_id
-    const results = await user_utils.addLastSeenRecipes(user_name, recipe_id);
-    res.send(results);
-    }
-   catch (error) {
-    next(error);
-  }
-})
-
-
-// last search seen recipes (id's) by the user
-router.get("/lastView", async (req, res, next) =>{
-  try {
-    const user_name = req.session.user_id
-    const results = await user_utils.getLastView(user_name);
-    res.send(results);
+    await user_utils.addLastSeenRecipes(user_name, recipe_id);
+    res.status(200).send("Updated the last seen recipes");
     }
    catch (error) {
     next(error);

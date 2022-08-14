@@ -120,30 +120,22 @@ paths:
       - user
       summary: get full information of users recipes
       description: it returns full information for user's recipes
-      operationId: getFullRecipes
-      parameters:
-      - name: recipeName
-        in: query
-        description: pass the recipe name to get
-        required: true
-        style: form
-        explode: true
-        schema:
-          type: string
+      operationId: getUserRecipes
       responses:
         "200":
-          description: full recipe data was sent to client
+          description: full recipes data was sent to client
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/arrayOfRecipes'
-        "404":
-          description: No such recipe
+        "401":
+          description: Unauthorized user 
     post:
       tags:
       - user
       summary: add new recipe
       description: A JSON object contains all the details about the new recipe.
+      operationId: addRecipeToUser
       requestBody:
         description: New recipe to add
         content:
@@ -154,9 +146,9 @@ paths:
       responses:
         "200":
           description: A new recipe has been added
-        "400":
-          description: Wrong input parameters
-  /lastThree:
+        "401":
+          description: Unauthorized user 
+  /lastSeenRecipes:
     get:
       tags:
       - user
@@ -164,7 +156,7 @@ paths:
       description: it returns 3 last seen recipes by the logged in user
       operationId: getThreeLastRecipes
       parameters:
-      - name: lastSeen1
+      - name: first_recipe
         in: query
         description: first last seen recipe id
         required: false
@@ -172,7 +164,7 @@ paths:
         explode: true
         schema:
           type: string
-      - name: lastSeen2
+      - name: second_recipe
         in: query
         description: second last seen recipe id
         required: false
@@ -180,7 +172,7 @@ paths:
         explode: true
         schema:
           type: string
-      - name: lastSeen3
+      - name: third_recipe
         in: query
         description: third last seen recipe id
         required: false
@@ -197,13 +189,32 @@ paths:
                 $ref: '#/components/schemas/arrayOfRecipes'
         "400":
           description: bad input was given
+    post:
+      tags:
+      - user
+      summary: updates the last seen recipes
+      description: gets the recipe_id that was watched and adds to users data in db
+      operationId: addLastSeenRecipes
+      requestBody:
+        description: New family recipe to add
+        content:
+          text/plain:
+                schema:
+                  type: string
+                  example: '614253'
+        required: true
+      responses:
+          "200":
+            description: last seem recie was updated
+          "400":
+            description: Failed adding the recipe to last seen
   /searchForRecipe/{searchString}:
     get:
       tags:
       - recipes
       summary: search for recipe
       description: returns search result for recipe
-      operationId: search
+      operationId: searchForRecipe
       parameters:
       - name: searchString
         in: path
@@ -257,7 +268,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/searchResultsArray'
+                $ref: '#/components/schemas/arrayOfRecipes'
         "400":
           description: Something went wrong
   /family:
@@ -265,23 +276,23 @@ paths:
       tags:
       - user
       summary: family recipes of user
-      description: returns at least 3 family recipes of the logged in user
-      operationId: getFamilyRecipes
+      description: returns family recipes of the logged in user
+      operationId: getFamilyRecipesFromDb
       responses:
         "200":
-          description: array of 3 recipes
+          description: array of family recipes
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/arrayOfRecipesFamily'
-        "400":
-          description: bad input was given
+        "401":
+          description: Unauthorized user 
     post:
       tags:
       - user
       summary: new family recipe
       description: adds new family recipe to user in db
-      operationId: addFamilyRecipes
+      operationId: addFamilyRecipeToDb
       requestBody:
         description: New family recipe to add
         content:
@@ -296,50 +307,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/familyRecipe'
-        "400":
-          description: bad input was given
+        "401":
+          description: Unauthorized user 
   /favorites:
     get:
       tags:
       - user
       summary: favorites of user
-      description: returns 3 favorite recipes of the logged in user
-      operationId: getFavorites
+      description: returns favorite recipes of the logged in user
+      operationId: getFavoriteRecipes
       responses:
         "200":
-          description: array of 3 recipes
+          description: array of favorite recipes
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/arrayOfRecipes'
-        "400":
-          description: something went wrong
+        "401":
+          description: Unauthorized user 
     post:
       tags:
       - user
       summary: add recipe to favorites
       description: adds favorite recipe to user in db
-      operationId: addToFavorites
+      operationId: markAsFavorite
       requestBody:
         description: recipe ID of the favortie recipe of user to add to db
         content:
           plain/text:
             schema:
-              type: integer
-            example: 7124565
+              type: string
+              example: '7124565'
         required: true
       responses:
         "200":
-          description: new family recipe was added to db
-        "400":
-          description: bad input was given
+          description: new favorite recipe was added to db
+        "401":
+          description: Unauthorized user 
   /random:
     get:
       tags:
       - recipes
       summary: random recipes
       description: returns 3 random recipes from external API
-      operationId: getRandoms
+      operationId: getRandomRecipes
       responses:
         "200":
           description: array of 3 recipes
@@ -407,16 +418,16 @@ components:
     partRecipe:
       type: object
       properties:
-        recipename:
+        recipe_name:
           type: string
           description: recipe name
           example: katya's cake
-        timeToMake:
+        duration:
           minimum: 5
           type: integer
           description: time it will take to make the recipe
           example: 30
-        picture:
+        image:
           type: string
           description: picture of the dish
           format: URL
@@ -441,16 +452,16 @@ components:
     fullRecipe:
       type: object
       properties:
-        recipename:
+        recipe_name:
           type: string
           description: recipe name
           example: katya's cake
-        timeToMake:
+        duration:
           minimum: 5
           type: integer
           description: time it will take to make the recipe
           example: 30
-        picture:
+        image:
           type: string
           description: picture of the dish
           format: URL
@@ -467,19 +478,19 @@ components:
           type: boolean
           description: recipe is vegeterian or not
           example: false
-        favorite:
+        glutenFree: 
           type: boolean
-          description: recipe in favorites of user or not
+          description: recipe is gluten free or not
           example: false
         instructions:
           type: string
           description: instructions for the recipe
           example: put eggs into plate, scrumble, and put on the oven.
-        numberOfDishes:
+        servings:
           type: integer
           description: the number of dishes you get from the recipe
           example: 24
-        ingredients:
+        extendedIngredients:
           type: array
           description: ingredients list and the quantities.
           example: g.milk 2 , eggs, 2
@@ -502,57 +513,6 @@ components:
           - recipe3 part info
           items:
             $ref: '#/components/schemas/partRecipe'
-      description: return array of recipes
-    searchResult:
-      type: object
-      properties:
-        recipename:
-          type: string
-          description: recipe name
-          example: katya's cake
-        timeToMake:
-          minimum: 5
-          type: integer
-          description: time it will take to make the recipe
-          example: 30
-        picture:
-          type: string
-          description: picture of the dish
-          format: URL
-        popularity:
-          minimum: 0
-          type: integer
-          description: number of people that liked this recipe
-          example: 100
-        vegan:
-          type: boolean
-          description: recipe is vegan or not
-          example: false
-        vegeterian:
-          type: boolean
-          description: recipe is vegeterian or not
-          example: false
-        favorite:
-          type: boolean
-          description: recipe in favorites of user or not
-          example: false
-        instructions:
-          type: string
-          description: instructions for the recipe
-          example: put eggs into plate, scrumble, and put on the oven.
-      description: Model for recipe that return in a search
-    searchResultsArray:
-      type: object
-      properties:
-        arr:
-          type: array
-          description: array of recipes that were found in the search
-          example:
-          - recipe1 search result
-          - recipe2 search result
-          - recipe3 search result
-          items:
-            $ref: '#/components/schemas/searchResult'
       description: return array of recipes
     familyRecipe:
       type: object
@@ -593,9 +553,9 @@ components:
           type: array
           description: array of family recipes
           example:
-          - recipe1 part info
-          - recipe2 part info
-          - recipe3 part info
+          - family recipe 1 
+          - family recipe 2
+          - family recipe 3
           items:
             $ref: '#/components/schemas/familyRecipe'
       description: return array of family recipes

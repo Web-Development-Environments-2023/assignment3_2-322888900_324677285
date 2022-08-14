@@ -5,6 +5,8 @@ const recipes_utils = require("./utils/recipes_utils");
 
 router.get("/", (req, res) => res.send("im here"));
 
+
+//NEVER USED
 // This path returns the details of a recipe by its id
 router.get("/partialRecipe/:recipeId", async (req, res, next) => {
   try {
@@ -15,7 +17,7 @@ router.get("/partialRecipe/:recipeId", async (req, res, next) => {
   }
 });
 
-
+//NEVER USED
 // This path returns a full details of a recipe by its id
  router.get("/fullRecipe/:recipeId", async (req, res, next) => {
   try {
@@ -31,7 +33,7 @@ router.get("/partialRecipe/:recipeId", async (req, res, next) => {
 router.get("/random", async (req, res, next) => {
   try {
     const results = await recipes_utils.getRandomRecipes();
-    res.send(results);
+    res.status(200).send(results);
   } catch (error) {
     next(error);
   }
@@ -43,7 +45,7 @@ router.get("/random", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.searchForRecipe(req.params.query,  
       req.query.numberOfResults, req.query.cuisine, req.query.diet, req.params.intolerances);
-    res.send(recipe);
+    res.status(200).send(recipe);
   } catch (error) {
     next(error);
   }
