@@ -128,7 +128,7 @@ async function addLastSeenRecipes(user_name, Recipe){
 
 async function addRecipeToUser(params){
     try{
-        await DButils.execQuery(`INSERT INTO myrecipes (title, readyInMinutes, image, aggregateLikes, is_vegan, is_vegeterian, gluten_free, user_name, ingredients, instructions, number_of_dishes) VALUES ('${params.recipe_name}','${params.duration}', '${params.image}', '${params.popularity}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}', "${params.user_name}",' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
+        await DButils.execQuery(`INSERT INTO myrecipes (title, readyInMinutes, image, aggregateLikes, is_vegan, is_vegeterian, gluten_free, user_name, ingredients, instructions, number_of_dishes) VALUES ('${params.recipe_name}','${params.duration}', '${params.image}', '${params.aggregateLikes}', '${params.vegan!=undefined ? 1:0}', '${params.vegeterian!=undefined? 1:0}',' ${params.glutenFree!=undefined ? 1:0}', "${params.user_name}",' ${params.extendedIngredients}','${params.instructions}',' ${params.servings}')`);
     }
     catch(err){
         throw { status: 401, message: err };

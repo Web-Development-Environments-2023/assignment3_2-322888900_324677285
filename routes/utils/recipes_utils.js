@@ -26,7 +26,7 @@ async function getRecipeDetails(recipe_id, includeNutrition_value, search_result
         title: title,
         readyInMinutes: readyInMinutes,
         image: image,
-        popularity: aggregateLikes,
+        aggregateLikes: aggregateLikes,
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,

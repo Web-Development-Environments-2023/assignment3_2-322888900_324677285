@@ -431,7 +431,7 @@ components:
           type: string
           description: picture of the dish
           format: URL
-        popularity:
+        aggregateLikes:
           minimum: 0
           type: integer
           description: number of people that liked this recipe
@@ -465,7 +465,7 @@ components:
           type: string
           description: picture of the dish
           format: URL
-        popularity:
+        aggregateLikes:
           minimum: 0
           type: integer
           description: number of people that liked this recipe
