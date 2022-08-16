@@ -498,6 +498,11 @@ components:
             $ref: '#/components/schemas/fullRecipe_ingredients'
         analyzedInstructions:
           type: array
+          items:
+            items:
+              type: array
+              items:
+                type: string
           description: analayzed instructions
           example: 1. do this, 2. do that...
       description: Model for part of the recipe data
