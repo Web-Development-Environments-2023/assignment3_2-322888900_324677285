@@ -30,7 +30,8 @@ async function getRecipeDetails(recipe_id, includeNutrition_value, search_result
         vegan: vegan,
         vegetarian: vegetarian,
         glutenFree: glutenFree,
-        analyzedInstructions: analyzedInstructions
+        instructions: instructions,
+        analyzedInstructions: analyzedInstructions,
     }
 
     if (includeNutrition_value == false && search_result == false){
@@ -44,6 +45,7 @@ async function getRecipeDetails(recipe_id, includeNutrition_value, search_result
     }
     else if(includeNutrition_value == false && search_result == true){
         json_data.instructions = instructions
+        json_data.analyzedInstructions = analyzedInstructions
         return json_data
     }
 }
